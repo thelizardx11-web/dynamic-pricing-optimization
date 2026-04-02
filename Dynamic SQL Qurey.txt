@@ -1,0 +1,122 @@
+-- Create database 
+CREATE DATABASE dynamic_pricing;
+USE dynamic_pricing;
+
+-- Create Table 
+CREATE TABLE rides (
+    ride_id INT PRIMARY KEY AUTO_INCREMENT,
+    Number_of_Riders INT,
+    Number_of_Drivers INT,
+    Location_Category VARCHAR(100),
+    Customer_Loyalty_Status VARCHAR(20),
+    Number_of_Past_Rides INT,
+    Average_Ratings DECIMAL(3,2),
+    Time_of_Booking VARCHAR(50),
+    Vehicle_Type VARCHAR(50),
+    Expected_Ride_Duration INT,
+    Historical_Cost_of_Ride DECIMAL(10,2)
+);
+
+-- load data
+SELECT * FROM mydynamic_pricing;
+
+-- 1. Overall KPIs
+SELECT 
+    ROUND(AVG(Average_Ratings),2) AS avg_rating,
+    SUM(Historical_Cost_of_Ride) AS total_revenue,
+    SUM(Number_of_Riders) AS total_demand
+FROM mydynamic_pricing;
+
+-- 2. Revenue by location category 
+SELECT 
+    Location_Category,
+    SUM(Historical_Cost_of_Ride) AS category_revenue,
+    SUM(Number_of_Riders) AS total_riders,
+    ROUND(AVG(Average_Ratings),2) AS avg_rating
+FROM mydynamic_pricing
+GROUP BY Location_Category
+ORDER BY category_revenue DESC;
+
+-- 3. Revenue by vehicle Type
+SELECT 
+    Vehicle_Type,
+    SUM(Historical_Cost_of_Ride) AS total_revenue,
+    AVG(Expected_Ride_Duration) AS avg_duration,
+    SUM(Number_of_Riders) AS total_riders
+FROM mydynamic_pricing
+GROUP BY Vehicle_Type
+ORDER BY total_revenue DESC;
+
+-- 4. Loyalty status Analysis
+SELECT 
+    Customer_Loyalty_Status,
+    COUNT(*) AS total_bookings,
+    SUM(Historical_Cost_of_Ride) AS total_revenue,
+    ROUND(AVG(Average_Ratings),2) AS avg_rating
+FROM mydynamic_pricing
+GROUP BY Customer_Loyalty_Status
+ORDER BY total_revenue DESC;
+
+-- 5: Time of booking Trends
+SELECT 
+    Time_of_Booking,
+    COUNT(*) AS total_bookings,
+    SUM(Historical_Cost_of_Ride) AS total_revenue,
+    ROUND(AVG(Average_Ratings),2) AS avg_rating
+FROM mydynamic_pricing
+GROUP BY Time_of_Booking
+ORDER BY total_bookings DESC;
+
+-- 6. TOP 10 Highest revenue rides
+SELECT 
+    Number_of_Riders,
+    Vehicle_Type,
+    Location_Category,
+    Historical_Cost_of_Ride,
+    Average_Ratings
+FROM mydynamic_pricing
+ORDER BY Historical_Cost_of_Ride DESC
+LIMIT 10;
+
+-- 7. Average rating by vehicle type 
+SELECT 
+    Vehicle_Type,
+    ROUND(AVG(Average_Ratings),2) AS avg_rating,
+    COUNT(*) AS total_rides
+FROM mydynamic_pricing
+GROUP BY Vehicle_Type
+ORDER BY avg_rating DESC;
+
+SHOW COLUMNS FROM mydynamic_pricing;
+
+-- 8. Past rides vs Revenue 
+SELECT 
+    Number_of_Past_Rides,
+    ROUND(AVG(Historical_Cost_of_Ride),2) AS avg_revenue
+FROM mydynamic_pricing
+GROUP BY Number_of_Past_Rides
+ORDER BY Number_of_Past_Rides ASC
+LIMIT 10;
+
+-- 9. Driver supply vs Riders demand
+SELECT 
+    Number_of_Drivers,
+    SUM(Number_of_Riders) AS total_riders,
+    SUM(Historical_Cost_of_Ride) AS total_revenue
+FROM mydynamic_pricing
+GROUP BY Number_of_Drivers
+ORDER BY Number_of_Drivers ASC;
+
+-- 10. Premium vs Economy camparsion 
+SELECT 
+    Vehicle_Type,
+    COUNT(*) AS total_rides,
+    SUM(Historical_Cost_of_Ride) AS total_revenue,
+    ROUND(AVG(Average_Ratings),2) AS avg_rating
+FROM mydynamic_pricing
+WHERE Vehicle_Type IN ('Premium','Economy')
+GROUP BY Vehicle_Type;
+
+USE dynamic_pricing;
+SELECT * FROM mydynamic_pricing;
+
